@@ -6,7 +6,7 @@ const initialState = {
   email: null,
   name: null,
   isLoggedIn: false,
-  token: null, // Tambahkan untuk menyimpan access_token
+  token: null,
 };
 
 const userSlice = createSlice({
@@ -16,12 +16,25 @@ const userSlice = createSlice({
     login(state, action) {
       const token = action.payload;
       try {
-        const decodedToken = jwtDecode(token); // Decode JWT untuk mendapatkan data pengguna
+        const decodedToken = jwtDecode(token);
         state.id = decodedToken.data.id;
         state.email = decodedToken.data.email;
         state.name = decodedToken.data.name;
         state.isLoggedIn = true;
-        state.token = token; // Simpan token di state
+        state.token = token;
+      } catch (error) {
+        console.error("Invalid token:", error);
+      }
+    },
+    setToken(state, action) {
+      const token = action.payload;
+      try {
+        const decodedToken = jwtDecode(token);
+        state.id = decodedToken.data.id;
+        state.email = decodedToken.data.email;
+        state.name = decodedToken.data.name;
+        state.isLoggedIn = true;
+        state.token = token;
       } catch (error) {
         console.error("Invalid token:", error);
       }
@@ -29,12 +42,12 @@ const userSlice = createSlice({
     register(state, action) {
       const token = action.payload;
       try {
-        const decodedToken = jwtDecode(token); // Sama seperti login, decode JWT
+        const decodedToken = jwtDecode(token);
         state.id = decodedToken.data.id;
         state.email = decodedToken.data.email;
         state.name = decodedToken.data.name;
         state.isLoggedIn = true;
-        state.token = token; // Simpan token di state
+        state.token = token;
       } catch (error) {
         console.error("Invalid token:", error);
       }
@@ -44,7 +57,7 @@ const userSlice = createSlice({
       state.email = null;
       state.name = null;
       state.isLoggedIn = false;
-      state.token = null; // Hapus token dari state
+      state.token = null;
     },
   },
 });

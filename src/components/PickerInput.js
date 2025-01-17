@@ -1,6 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import React, { useState } from "react";
 import { FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { theme } from "../core/theme";
 
 export default function PickerInput({ label, selectedValue, onValueChange, items, errorText }) {
   const [modalVisible, setModalVisible] = useState(false);
@@ -119,7 +120,7 @@ const styles = StyleSheet.create({
   },
   modalCloseButton: {
     marginTop: 16,
-    backgroundColor: "#007bff",
+    backgroundColor: theme.colors.primary,
     paddingVertical: 12,
     borderRadius: 4,
     alignItems: "center",

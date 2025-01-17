@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { useRoute } from "@react-navigation/native";
+import React, { useEffect, useState } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
@@ -7,9 +8,12 @@ import Button from "../../components/Button";
 import DatePickerInput from "../../components/DatePickerInput";
 import PickerInput from "../../components/PickerInput";
 import TextInput from "../../components/TextInput";
-import { createAudit } from "../../services/AuditService";
+import { updateAudit } from "../../services/AuditService";
+import { parseDateToCustomFormat } from "../../utils/dateFormat";
 
-export default function AuditScreen({ navigation, route }) {
+export default function EditAuditScreen({ navigation }) {
+  const route = useRoute();
+  const audit = route.params?.audit;
   const [title, setTitle] = useState({ value: "", error: "" });
   const [auditArea, setAuditArea] = useState();
   const [auditDate, setAuditDate] = useState(new Date());
@@ -25,7 +29,6 @@ export default function AuditScreen({ navigation, route }) {
   ];
 
   const handleSave = async () => {
-    // Validasi input
     if (!title.value) {
       setTitle({ ...title, error: "Title is required" });
       return;
@@ -39,6 +42,8 @@ export default function AuditScreen({ navigation, route }) {
       return;
     }
 
+    console.log("auditDate", auditDate);
+    console.log("closeDate", closeDate);
     const data = {
       title: title.value,
       area: auditArea,
@@ -48,26 +53,38 @@ export default function AuditScreen({ navigation, route }) {
 
     try {
       setLoading(true);
-      await createAudit(token, data);
-      Alert.alert("Success", "Audit created successfully");
+      await updateAudit(token, audit.id, data);
+      Alert.alert("Success", "Audit updated successfully");
       navigation.goBack();
     } catch (error) {
-      Alert.alert("Error", "Failed to create audit");
+      const errorMessage = error.response?.data?.message || "Failed to update audit";
+      Alert.alert("Error", errorMessage);
       console.error(error);
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+    console.log("Received audit data:", audit);
+    if (audit) {
+      const startDate = parseDateToCustomFormat(audit.start_date);
+      const closeDate = parseDateToCustomFormat(audit.close_date);
+    
+      setTitle({ value: audit.title, error: "" });
+      setAuditArea(audit.area);
+      setAuditDate(new Date(startDate));
+      setCloseDate(new Date(closeDate));
+    }
+  }, []);
+
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <BackButton navigation={navigation} param={route.params} />
+      <BackButton navigation={navigation} param={{ menu: "Edit Audit" }} />
 
-      {/* Content */}
       <View>
         <View style={{ marginTop: 4 }}>
-          <Text style={{ fontSize: 16, fontWeight: "semiBold" }}>Audit Title</Text>
+          <Text style={{ fontSize: 16, fontWeight: "600" }}>Audit Title</Text>
           <TextInput
             label="Title"
             returnKeyType="next"
@@ -80,27 +97,27 @@ export default function AuditScreen({ navigation, route }) {
         </View>
 
         <View style={{ marginTop: 4 }}>
-          <Text style={{ fontSize: 16, fontWeight: "semiBold" }}>Audit Area</Text>
+          <Text style={{ fontSize: 16, fontWeight: "600" }}>Audit Area</Text>
           <PickerInput
             label="Audit Area"
             selectedValue={auditArea}
             onValueChange={(itemValue) => setAuditArea(itemValue)}
-            items={auditAreas}
+            items={auditAreas.map((area) => ({ ...area, key: area.value }))}
           />
         </View>
 
         <View style={{ marginTop: 4 }}>
-          <Text style={{ fontSize: 16, fontWeight: "semiBold" }}>Audit Date</Text>
+          <Text style={{ fontSize: 16, fontWeight: "600" }}>Audit Date</Text>
           <DatePickerInput date={auditDate} setDate={setAuditDate} errorText="" />
         </View>
 
         <View style={{ marginTop: 4 }}>
-          <Text style={{ fontSize: 16, fontWeight: "semiBold" }}>Close Date</Text>
+          <Text style={{ fontSize: 16, fontWeight: "600" }}>Close Date</Text>
           <DatePickerInput date={closeDate} setDate={setCloseDate} errorText="" />
         </View>
 
         <Button style={{ marginTop: 20 }} mode="contained" onPress={handleSave} loading={loading}>
-          {loading ? "Saving..." : "Save"}
+          {loading ? "Updating..." : "Update"}
         </Button>
       </View>
     </SafeAreaView>

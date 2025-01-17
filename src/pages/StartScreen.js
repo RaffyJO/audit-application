@@ -19,7 +19,7 @@ export default function StartScreen({ navigation }) {
         mode="contained"
         onPress={() => navigation.navigate("LoginScreen")}
       >
-        Log in
+        Login
       </Button>
       <Button
         mode="outlined"

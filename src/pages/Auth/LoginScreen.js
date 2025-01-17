@@ -3,21 +3,22 @@ import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 import { Text } from "react-native-paper";
 
 import { useDispatch } from "react-redux";
-import Background from "../components/Background";
-import Button from "../components/Button";
-import Header from "../components/Header";
-import Logo from "../components/Logo";
-import TextInput from "../components/TextInput";
-import { theme } from "../core/theme";
-import { emailValidator } from "../helpers/emailValidator";
-import { passwordValidator } from "../helpers/passwordValidator";
-import { login as apiLogin } from "../services/AuthService";
-import { login } from "../store/slices/userSlice";
+import Background from "../../components/Background";
+import Button from "../../components/Button";
+import Header from "../../components/Header";
+import Logo from "../../components/Logo";
+import TextInput from "../../components/TextInput";
+import { theme } from "../../core/theme";
+import { emailValidator } from "../../helpers/emailValidator";
+import { passwordValidator } from "../../helpers/passwordValidator";
+import { login as apiLogin } from "../../services/AuthService";
+import { login } from "../../store/slices/userSlice";
+import { saveToken } from "../../utils/secureStore";
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState({ value: "", error: "" });
   const [password, setPassword] = useState({ value: "", error: "" });
-  const [loading, setLoading] = useState(false); // Tambahkan state untuk loading
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
   const onLoginPressed = async () => {
@@ -29,22 +30,20 @@ export default function LoginScreen({ navigation }) {
       return;
     }
 
-    setLoading(true); // Aktifkan loading
+    setLoading(true);
     try {
       const userData = await apiLogin(email.value, password.value);
       const token = userData.data.access_token;
-      console.log("Token:", token);
+      await saveToken("userToken", token);
       dispatch(login(token));
-      console.log("Login Successful:", userData);
       navigation.reset({
         index: 0,
         routes: [{ name: "MainTabs" }],
       });
     } catch (error) {
-      console.error("Login Failed:", error);
-      Alert.alert("Login Failed", error.message || "Something went wrong");
+      Alert.alert("Login Failed", error.data || "Something went wrong");
     } finally {
-      setLoading(false); // Matikan loading
+      setLoading(false);
     }
   };
 

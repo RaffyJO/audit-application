@@ -8,8 +8,8 @@ export default function HomeScreenHeader({ user }) {
       <View style={styles.profileContainer}>
         <Image source={{ uri: user?.imageUrl }} style={styles.userImage} />
         <View>
-          <Text style={{ color: theme.colors.onPrimary, fontWeight: "500" }}>Welcome,</Text>
-          <Text style={{ color: theme.colors.onPrimary, fontSize: 16, fontWeight: "500" }}>{user?.name}</Text>
+          <Text style={styles.text}>Welcome Back,</Text>
+          <Text style={styles.text}>{user?.name}</Text>
         </View>
       </View>
     </View>
@@ -19,8 +19,9 @@ export default function HomeScreenHeader({ user }) {
 const styles = StyleSheet.create({
     container: {
         padding: 16,
-        paddingTop: 32,
         backgroundColor: theme.colors.primary,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
         borderBottomLeftRadius: 20,
         borderBottomRightRadius: 20,
     },
@@ -31,8 +32,13 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     userImage: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+    },
+    text: {
+        color: theme.colors.onPrimary,
+        fontSize: 16,
+        fontWeight: "500",
     },
 });

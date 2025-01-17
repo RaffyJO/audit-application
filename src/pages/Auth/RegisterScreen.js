@@ -1,23 +1,28 @@
 import React, { useState } from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 import { Text } from "react-native-paper";
 
-import Background from "../components/Background";
-import Button from "../components/Button";
-import Header from "../components/Header";
-import Logo from "../components/Logo";
-import TextInput from "../components/TextInput";
-import { theme } from "../core/theme";
-import { emailValidator } from "../helpers/emailValidator";
-import { nameValidator } from "../helpers/nameValidator";
-import { passwordValidator } from "../helpers/passwordValidator";
+import { useDispatch } from "react-redux";
+import Background from "../../components/Background";
+import Button from "../../components/Button";
+import Header from "../../components/Header";
+import Logo from "../../components/Logo";
+import TextInput from "../../components/TextInput";
+import { theme } from "../../core/theme";
+import { emailValidator } from "../../helpers/emailValidator";
+import { nameValidator } from "../../helpers/nameValidator";
+import { passwordValidator } from "../../helpers/passwordValidator";
+import { register as apiRegister } from "../../services/AuthService";
+import { register } from "../../store/slices/userSlice";
 
 export default function RegisterScreen({ navigation }) {
   const [name, setName] = useState({ value: "", error: "" });
   const [email, setEmail] = useState({ value: "", error: "" });
   const [password, setPassword] = useState({ value: "", error: "" });
+  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
-  const onSignUpPressed = () => {
+  const onSignUpPressed = async () => {
     const nameError = nameValidator(name.value);
     const emailError = emailValidator(email.value);
     const passwordError = passwordValidator(password.value);
@@ -27,10 +32,21 @@ export default function RegisterScreen({ navigation }) {
       setPassword({ ...password, error: passwordError });
       return;
     }
-    navigation.reset({
-      index: 0,
-      routes: [{ name: "HomeScreen" }],
-    });
+
+    setLoading(true);
+    try {
+      const userData = await apiRegister(email.value, password.value, name.value);
+      const token = userData.data.access_token;
+      dispatch(register(token));
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "MainTabs" }],
+      });
+    } catch (error) {
+      Alert.alert("Register Failed", error.data || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -70,8 +86,9 @@ export default function RegisterScreen({ navigation }) {
         mode="contained"
         onPress={onSignUpPressed}
         style={{ marginTop: 24 }}
+        loading={loading}
       >
-        Register
+        {loading ? "Signing up..." : "Sign Up"}
       </Button>
       <View style={styles.row}>
         <Text>I already have an account! </Text>

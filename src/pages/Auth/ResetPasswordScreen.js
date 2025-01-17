@@ -1,22 +1,34 @@
 import React, { useState } from "react";
 
-import Background from "../components/Background";
-import Button from "../components/Button";
-import Header from "../components/Header";
-import Logo from "../components/Logo";
-import TextInput from "../components/TextInput";
-import { emailValidator } from "../helpers/emailValidator";
+import { Alert } from "react-native";
+import Background from "../../components/Background";
+import Button from "../../components/Button";
+import Header from "../../components/Header";
+import Logo from "../../components/Logo";
+import TextInput from "../../components/TextInput";
+import { emailValidator } from "../../helpers/emailValidator";
+import { resetPassword as apiResetPassword } from "../../services/AuthService";
 
 export default function ResetPasswordScreen({ navigation }) {
   const [email, setEmail] = useState({ value: "", error: "" });
+  const [loading, setLoading] = useState(false);
 
-  const sendResetPasswordEmail = () => {
+  const sendResetPasswordEmail = async () => {
     const emailError = emailValidator(email.value);
     if (emailError) {
       setEmail({ ...email, error: emailError });
       return;
     }
-    navigation.navigate("LoginScreen");
+
+    setLoading(true);
+    try {
+      await apiResetPassword(email.value);
+      navigation.navigate("LoginScreen");
+    } catch (error) {
+      Alert.alert("Reset Password Failed", error.data || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

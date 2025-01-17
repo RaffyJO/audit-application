@@ -7,27 +7,27 @@ import { theme } from '../../core/theme';
 const icons = [
   {
     name: "Audit",
-    color: "red",
-    icon: "newspaper",
+    color: "green",
+    icon: "newspaper-outline",
     screen: "AuditScreen",
   },
   {
     name: "History",
     color: "blue",
-    icon: "newspaper",
+    icon: "albums-outline",
     screen: "HistoryScreen",
   },
   {
-    name: "wewewewe",
-    color: "yellow",
-    icon: "newspaper",
-    screen: "AuditScreen",
+    name: "Monitoring",
+    color: "red",
+    icon: "speedometer-outline",
+    screen: "ComingSoonScreen",
   },
   {
-    name: "newspaper",
+    name: "Report",
     color: "purple",
-    icon: "newspaper",
-    screen: "AuditScreen",
+    icon: "stats-chart-outline",
+    screen: "ComingSoonScreen",
   },
 ];
 
